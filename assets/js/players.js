@@ -310,3 +310,22 @@ var player_list = {
     "blue-player-4": blue_player_4,
 
 }
+document.addEventListener("DOMContentLoaded", function() {
+  var TogetherJSConfig = {
+    // ENABLE CURSOR FEATURES
+    dontShowClicks: false,
+    cloneClicks: true,
+    ignoreMessages: [], // Clear ignored messages to allow cursor updates
+    enableElementClicks: true,
+
+    // WEBRTC CONFIG (REQUIRED FOR CURSORS)
+    disableWebRTC: false,
+        // ESSENTIAL SETTINGS
+    hubBase: "https://sprinkle-lizard-peripheral.glitch.me/",
+     // or "tjs_madlibs" depending on your project
+    autoStart: true,  // Set to true if you want auto-start behavior
+    suppressJoinConfirmation: true,
+    disableCursor: false,  // Ensure cursor feature is enabled
+
+};
+});

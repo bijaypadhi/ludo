@@ -205,47 +205,51 @@ const sleep = (milliseconds) => {
 
 
 
-
 $("#dice").click(function () {
     if (stoptime) {
         startTimer();
     }
-    if (dice_value != 0) {
-        return false;
-    }
-    if (rank_count > (turn_oder.length - 2)) {
-        deactivateDice();
 
+    if (dice_value != 0) {
+        return false;  // Prevent further rolls until the current roll is processed
+    }
+
+    if (rank_count > (turn_oder.length - 2)) {
+        deactivateDice();  // Deactivate the dice if the turn limit is reached
         return false;
     }
+
+    // Generate a random dice value (1 to 6)
     dice_value = Math.random() * (7 - 1) + 1;
     dice_value = Math.floor(dice_value);
-    // dice_value=2;
-    // $("#dice").text(dice_value);
-    deactivateDice();
+
+    deactivateDice();  // Deactivate dice after roll
 
     if (dice_value == 6) {
-        six_count++;
+        six_count++;  // Increase six count if 6 is rolled
     } else {
-        six_count = 0;
+        six_count = 0;  // Reset if not 6
     }
-    // console.log("Dice : ",dice_value);
-    dice_sound.play();
+
+    dice_sound.play();  // Play dice roll sound
+
+    // Handle logic based on the dice roll
     if (getActivePlayers(current_turn.players[0].home) == 0 && dice_value != 6) {
-        console.log(current_turn.group + " : no player is active , shifting turn to next player");
+        console.log(current_turn.group + " : No active player, shifting turn to next player");
         hold(hold_time).then(() => {
             updateTurn(++current_turn_index);
             activateDice();
         });
 
     } else if (!getHomePlayers(current_turn.players[0].home) && getActivePlayers(current_turn.players[0].home) == 0 && dice_value == 6) {
-        console.log(current_turn.group + " : you can't use this dice value, so shifting turn to next player");
+        console.log(current_turn.group + " : You can't use this dice value, shifting turn to next player");
         hold(hold_time).then(() => {
             updateTurn(++current_turn_index);
             activateDice();
         });
+
     } else if (getActivePlayers(current_turn.players[0].home) == 1 && dice_value < 6) {
-        console.log(current_turn.group + " : you only have 1 active player so moving automatically");
+        console.log(current_turn.group + " : You only have 1 active player, moving automatically");
 
         hold(hold_time).then(() => {
             for (i = 0; i < 4; i++) {
@@ -256,7 +260,7 @@ $("#dice").click(function () {
         });
 
     } else if (getActivePlayers(current_turn.players[0].home) == 1 && getHomePlayers(current_turn.players[0].home) == 0 && dice_value == 6) {
-        console.log(current_turn.group + " : you only have 1 active player so moving automatically");
+        console.log(current_turn.group + " : You only have 1 active player, moving automatically");
 
         hold(hold_time).then(() => {
             for (i = 0; i < 4; i++) {
@@ -267,7 +271,8 @@ $("#dice").click(function () {
         });
 
     } else if (getHomePlayers(current_turn.players[0].home) == 1 && getActivePlayers(current_turn.players[0].home) == 0 && dice_value == 6) {
-        console.log(current_turn.group + " : you got 6 but , you don't have any active players and only 1 player in home so making it active");
+        console.log(current_turn.group + " : You got 6, but you don't have any active players. Making a player active.");
+
         hold(hold_time).then(() => {
             for (i = 0; i < 4; i++) {
                 if (current_turn.players[i].status == 'home') {
@@ -275,61 +280,63 @@ $("#dice").click(function () {
                 }
             }
         });
-
     }
 
-    //     if(getActivePlayers(current_turn.players[0].home)==0 && dice_value!=6){
-    //         ////console.log("no "+current_turn.group+" players is active");
-    //         var playermoved=false;
-    //         for(i=0;i<4;i++){
-
-    //             if( current_turn.players[i].status=='active' && current_turn.players[i].current_position+dice_value<=current_turn.players[i].path.length){
-    // $(current_turn.players[i].controller+'').trigger("click");
-    // playermoved=true;
-    //             }
-    //         }
-    //   hold(hold_time).then(()=>{
-    // if(!playermoved){
-    //     activateDice();
-    //     updateTurn(++current_turn_index);
-    // }
-    // });
-
-    //     }else if(getActivePlayers(current_turn.players[0].home)==1 && dice_value<6){
-    //         ////console.log("only 1 player is active, so running automatically");
-    //         for(i=0;i<4;i++){
-
-    //             if( current_turn.players[i].status=='active'){
-    // $(current_turn.players[i].controller+'').trigger("click");
-    //             }
-    //         }
-
-    //     }else if(getActivePlayers(current_turn.players[0].home)==0 && dice_value==6){
-    //         ////console.log("no player is active, making a player active");
-    //         hold(hold_time).then(()=>{
-    //             var need_to_go=true;
-    //             for(i=0;i<4;i++){
-
-    //                 if( current_turn.players[i].status=='home'){
-    //     $(current_turn.players[i].controller+'').trigger("click");
-    //     need_to_go=false;
-    //     break;
-    //                 }
-    //             }
-
-    //             if(need_to_go){
-    //                 activateDice();
-    //                 updateTurn(++current_turn_index);
-    //                 return 0;   
-    //             }
-
-
-    //         });
-
-
-
-    //     }
+    // Send the dice roll event to other players using TogetherJS
+    if (TogetherJS.running) {
+        TogetherJS.send({
+            "type": "diceRoll",
+            "dice_value": dice_value,
+            "turnIndex": current_turn_index
+        });
+    }
 });
+
+// Listen for dice roll events from other users
+TogetherJS.hub.on("diceRoll", function (msg) {
+    // Ensure that the message comes from the same session
+    if (!msg.sameUrl) return;
+
+    // Update dice value based on received message
+    console.log("Received Dice Roll: ", msg.dice_value);
+    dice_value = msg.dice_value;
+
+    // Process the roll received from another player
+    if (dice_value == 6) {
+        six_count++;
+    } else {
+        six_count = 0;
+    }
+
+    dice_sound.play();
+    // Continue with the same logic as the original roll
+    if (getActivePlayers(current_turn.players[0].home) == 0 && dice_value != 6) {
+        console.log(current_turn.group + " : No active player, shifting turn to next player");
+        hold(hold_time).then(() => {
+            updateTurn(++current_turn_index);
+            activateDice();
+        });
+
+    } else if (!getHomePlayers(current_turn.players[0].home) && getActivePlayers(current_turn.players[0].home) == 0 && dice_value == 6) {
+        console.log(current_turn.group + " : You can't use this dice value, shifting turn to next player");
+        hold(hold_time).then(() => {
+            updateTurn(++current_turn_index);
+            activateDice();
+        });
+
+    } else if (getActivePlayers(current_turn.players[0].home) == 1 && dice_value < 6) {
+        console.log(current_turn.group + " : You only have 1 active player, moving automatically");
+
+        hold(hold_time).then(() => {
+            for (i = 0; i < 4; i++) {
+                if (current_turn.players[i].status == 'active') {
+                    $(current_turn.players[i].controller + '').trigger("click");
+                }
+            }
+        });
+    }
+});
+
 const hold = async (milliseconds) => {
     ////console.log("holding for "+milliseconds/1000+" seconds");
     await sleep(milliseconds);
@@ -977,3 +984,4 @@ $("#moveblue4").click(() => {
 $(".restartgame").click(() => {
     location.reload();
 });
+
