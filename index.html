@@ -15,7 +15,39 @@ Instagram : @oyeitsmg
     <!-- <link rel="stylesheet" href="assets/css/dice.css?version=<?=time()?>" type="text/css"> -->
 <link rel="icon" href="assets/img/dice.png">
 <script src="assets/js/jquery-3.6.0.min.js"></script>
+<script>
+  var TogetherJSConfig = {
+    // ENABLE CURSOR FEATURES
+     dontShowClicks: false,
+    cloneClicks: true,
+    ignoreMessages: ["cursor-update", "keydown", "scroll-update", "peer-update"], // Clear ignored messages to allow cursor updates
+    enableElementClicks: true,
 
+    // WEBRTC CONFIG (REQUIRED FOR CURSORS)
+    disableWebRTC: false,
+        // ESSENTIAL SETTINGS
+    hubBase: "https://sprinkle-lizard-peripheral.glitch.me/",
+     // or "tjs_madlibs" depending on your project
+    autoStart: true,  // Set to true if you want auto-start behavior
+    suppressJoinConfirmation: true,
+    disableCursor: false,  // Ensure cursor feature is enabled
+
+    // Custom Room Prefix and Limits (if relevant for your setup)
+    findRoom: {
+        prefix: "togetherjsmadlibs",
+        max: 5
+    }
+};
+
+</script>
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+  // Initialize TogetherJS after the DOM is ready
+  alert("fwef");
+  TogetherJS.init();
+});
+</script>
+<script src="./togetherjs-min.js? version=<?=time()?>"></script>
 <script src="assets/js/players.js?version=<?=time()?>"></script>
 
     <title>Ludo Board Game v3.0</title>
@@ -56,7 +88,6 @@ Instagram : @oyeitsmg
        <span>KEYBOARD CONTROLS</span> <br>   
        <kbd>Space</kbd> for dice & <kbd>1</kbd> <kbd>2</kbd> <kbd>3</kbd> <kbd>4</kbd> for players</div>
        <hr>
-<div class="super-center">Developed By Dev Ninja /&nbsp;<a href="https://www.youtube.com/devninja" class="text-decoration-none" target="_blank">Follow</a></div> 
 
 
 </div>
@@ -232,16 +263,6 @@ Instagram : @oyeitsmg
 <script src="assets/js/logic.js?version=<?=time()?>"></script>
 
 <script src="assets/js/autorun.js?version=<?=time()?>"></script>
-
-
-
-
+<script>
 </body>
 </html>
-<!-- 
-Developed By DevNinja ("Monu Giri")
-Email : whodevninja@gmail.com
-Instagram : @oyeitsmg 
--->
-
-<!-- Any use of this project without the permission of developer is restricted -->
